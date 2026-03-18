@@ -147,7 +147,7 @@ function LoginScreen({ nameInput, setNameInput, onLogin }) {
     <div style={{ minHeight: "100vh", background: C.caveBlue, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Avenir','Gill Sans','Century Gothic',sans-serif", padding: 24, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(158,181,203,0.12) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
       <div style={{ position: "relative", background: C.white, borderRadius: 20, padding: "48px 40px", maxWidth: 420, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)", textAlign: "center" }}>
-        <div style={{ width: 72, height: 72, borderRadius: 18, background: C.caveBlue, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 32, margin: "0 auto 20px" }}>💙</div>
+        <img src="/spark.png" alt="SPARK 2026" style={{ width: 160, margin: "0 auto 20px", display: "block" }} />
         <div style={{ fontSize: 11, color: C.textLight, letterSpacing: 4, textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>IGA Nephropathy Foundation</div>
         <h1 style={{ margin: "0 0 4px", fontSize: 32, fontWeight: 900, color: C.caveBlue, fontFamily: "'Georgia','Times New Roman',serif", letterSpacing: -0.5 }}>SPARK 2026</h1>
         <div style={{ fontSize: 13, color: C.marigold, fontWeight: 800, letterSpacing: 2, marginBottom: 32 }}>AMBASSADOR HUB · ATLANTA</div>
@@ -282,7 +282,7 @@ function Hub({ ambassador, onLogout }) {
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(158,181,203,0.12) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
         <div style={{ position: "relative", maxWidth: 980, margin: "0 auto", padding: "20px 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: C.marigold, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, flexShrink: 0 }}>💙</div>
+            <img src="/spark.png" alt="SPARK" style={{ height: 48, width: "auto", borderRadius: 8 }} />
             <div>
               <div style={{ fontSize: 10, color: C.powderBlue, letterSpacing: 4, textTransform: "uppercase", fontWeight: 600, marginBottom: 2 }}>IGA Nephropathy Foundation</div>
               <div style={{ fontSize: 22, fontWeight: 900, color: C.white, letterSpacing: -0.5, fontFamily: "'Georgia',serif" }}>SPARK 2026 <span style={{ color: C.marigold, fontSize: 14, letterSpacing: 2 }}>AMBASSADOR HUB</span></div>
