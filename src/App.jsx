@@ -1,16 +1,5 @@
 // ============================================================
 // IGA NEPHROPATHY FOUNDATION — SPARK 2026 Ambassador Hub
-// Supabase Edition · Deploy to Vercel
-// Required tables:
-//   tasks, sessions, task_progress
-// Run in Supabase SQL Editor before deploying:
-//   CREATE TABLE task_progress (
-//     id bigint primary key,
-//     ambassador_name text,
-//     task_id bigint,
-//     done boolean default false,
-//     UNIQUE(ambassador_name, task_id)
-//   );
 // ============================================================
 
 import { useState, useEffect, useCallback } from "react";
@@ -47,66 +36,267 @@ const CAT_STYLE = {
 };
 
 const SEED_TASKS = [
-  { id: 1,  category: "Before Event",  text: "Complete all pre-event Ambassador training materials", done: false },
-  { id: 2,  category: "Before Event",  text: "Attend NEW Ambassador Training (Friday 10AM–4PM, by invite)", done: false },
-  { id: 3,  category: "Before Event",  text: "Attend ALL Ambassador Meeting (Friday 3:45–4:45PM, by invite)", done: false },
-  { id: 4,  category: "Before Event",  text: "Review the full SPARK 2026 agenda for all three days", done: false },
-  { id: 5,  category: "Before Event",  text: "Familiarize yourself with the venue layout and room locations", done: false },
-  { id: 6,  category: "Before Event",  text: "Pick up your Ambassador badge, lanyard, and welcome kit at Check-In", done: false },
-  { id: 7,  category: "Before Event",  text: "Join the Ambassador group chat or communication channel", done: false },
-  { id: 8,  category: "Before Event",  text: "Review Ambassador talking points and FAQs about IgAN and SPARK", done: false },
-  { id: 9,  category: "Before Event",  text: "Know your assigned sessions and responsibilities for each day", done: false },
-  { id: 10, category: "Friday 7/24",   text: "Welcome attendees at Check-In (12PM–8PM) and direct to registration", done: false },
-  { id: 11, category: "Friday 7/24",   text: "Help set the tone at the First Time at SPARK Mixer (3:00–3:30PM)", done: false },
-  { id: 12, category: "Friday 7/24",   text: "Staff the Exhibit Hall (5:00–8:30PM) and engage attendees at booths", done: false },
-  { id: 13, category: "Friday 7/24",   text: "Encourage attendees to sign up for IgAN Hope Portraits (1PM–6PM)", done: false },
-  { id: 14, category: "Friday 7/24",   text: "Assist with Cocktail Hour/Reception logistics (6:00–8:00PM)", done: false },
-  { id: 15, category: "Friday 7/24",   text: "Introduce attendees to each other and foster connections all evening", done: false },
-  { id: 16, category: "Saturday 7/25", text: "Assist with SPARK Check-In (7:30–8:30AM) and direct attendees", done: false },
-  { id: 17, category: "Saturday 7/25", text: "Help with Breakfast setup and flow (7:30–8:30AM)", done: false },
-  { id: 18, category: "Saturday 7/25", text: "Staff the Exhibit Hall and support throughout the day (8AM–8PM)", done: false },
-  { id: 19, category: "Saturday 7/25", text: "Support Opening Sessions — seating, AV needs, room logistics (8:30AM)", done: false },
-  { id: 20, category: "Saturday 7/25", text: "Facilitate smooth transitions between sessions and stretch breaks", done: false },
-  { id: 21, category: "Saturday 7/25", text: "Assist with Kids Activity during lunch (1:30–2:30PM)", done: false },
-  { id: 22, category: "Saturday 7/25", text: "Staff Breakout Sessions 1a/1b, 2a/2b, 3a/3b — manage rooms and Q&A", done: false },
-  { id: 23, category: "Saturday 7/25", text: "Help set up and run Saturday Night SPARK Awards Ceremony (6:30PM)", done: false },
-  { id: 24, category: "Saturday 7/25", text: "Assist with Prize Drawing at end of evening (9:00PM)", done: false },
-  { id: 25, category: "Saturday 7/25", text: "Capture photos and share to the official SPARK 2026 hashtag", done: false },
-  { id: 26, category: "Sunday 7/26",   text: "Help with Breakfast flow and direct attendees to sessions (8–9:15AM)", done: false },
-  { id: 27, category: "Sunday 7/26",   text: "Staff Exhibit Hall for final morning (8AM–12PM)", done: false },
-  { id: 28, category: "Sunday 7/26",   text: "Support Sunday Presentations — room management and attendee assistance", done: false },
-  { id: 29, category: "Sunday 7/26",   text: "Assist with Empower & Engage interactive session (11:35AM–12:35PM)", done: false },
-  { id: 30, category: "Sunday 7/26",   text: "Be present for Closing Remarks and help wrap up (12:35–12:45PM)", done: false },
-  { id: 31, category: "After Event",   text: "Help with breakdown and direct attendees to exits and parking", done: false },
-  { id: 32, category: "After Event",   text: "Submit Ambassador feedback form within 24 hours of event close", done: false },
-  { id: 33, category: "After Event",   text: "Follow up with connections made at SPARK on LinkedIn or email", done: false },
-  { id: 34, category: "After Event",   text: "Share a SPARK 2026 recap post tagging IGA Nephropathy Foundation", done: false },
-  { id: 35, category: "After Event",   text: "Debrief with Ambassador team lead on wins and areas to improve", done: false },
+  { id: 1,  category: "Before Event",   text: "Complete all pre-event Ambassador training materials", done: false },
+  { id: 2,  category: "Before Event",   text: "Attend NEW Ambassador Training (Friday 10AM–4PM, by invite)", done: false },
+  { id: 3,  category: "Before Event",   text: "Attend ALL Ambassador Meeting (Friday 3:45–4:45PM, by invite)", done: false },
+  { id: 4,  category: "Before Event",   text: "Review the full SPARK 2026 agenda for all three days", done: false },
+  { id: 5,  category: "Before Event",   text: "Familiarize yourself with the venue layout and room locations", done: false },
+  { id: 6,  category: "Before Event",   text: "Pick up your Ambassador badge, lanyard, and welcome kit at Check-In", done: false },
+  { id: 7,  category: "Before Event",   text: "Join the Ambassador group chat or communication channel", done: false },
+  { id: 8,  category: "Before Event",   text: "Review Ambassador talking points and FAQs about IgAN and SPARK", done: false },
+  { id: 9,  category: "Before Event",   text: "Know your assigned sessions and responsibilities for each day", done: false },
+  { id: 10, category: "Friday 7/24",    text: "Welcome attendees at Check-In (12PM–8PM) and direct to registration", done: false },
+  { id: 11, category: "Friday 7/24",    text: "Help set the tone at the First Time at SPARK Mixer (3:00–3:45PM)", done: false },
+  { id: 12, category: "Friday 7/24",    text: "Support Start Strong session — seat attendees, assist speaker (3:45–5:15PM)", done: false },
+  { id: 13, category: "Friday 7/24",    text: "Staff the Exhibit Hall (5:00–8:30PM) and engage attendees at booths", done: false },
+  { id: 14, category: "Friday 7/24",    text: "Assist with Foundation Welcome & Update session (5:30–6:00PM)", done: false },
+  { id: 15, category: "Friday 7/24",    text: "Assist with Cocktail Hour/Reception logistics (6:00–8:00PM)", done: false },
+  { id: 16, category: "Friday 7/24",    text: "Introduce attendees to each other and foster connections all evening", done: false },
+  { id: 17, category: "Saturday 7/25",  text: "Assist with SPARK Check-In (7:30–8:30AM) and direct attendees", done: false },
+  { id: 18, category: "Saturday 7/25",  text: "Help with Breakfast setup and flow (7:30–8:30AM)", done: false },
+  { id: 19, category: "Saturday 7/25",  text: "Staff the Exhibit Hall throughout the day (8AM–8PM)", done: false },
+  { id: 20, category: "Saturday 7/25",  text: "Support Foundation Opening Remarks — seating, AV, logistics (8:30AM)", done: false },
+  { id: 21, category: "Saturday 7/25",  text: "Facilitate smooth transitions between sessions and stretch breaks", done: false },
+  { id: 22, category: "Saturday 7/25",  text: "Assist with Kids Activity during lunch (1:30–2:30PM)", done: false },
+  { id: 23, category: "Saturday 7/25",  text: "Staff Breakout Sessions — manage rooms, Q&A microphone, and timing", done: false },
+  { id: 24, category: "Saturday 7/25",  text: "Help set up and run Saturday Night SPARK Mystery Dinner & Awards (6PM)", done: false },
+  { id: 25, category: "Saturday 7/25",  text: "Assist with Prize Drawing at end of evening (9:00PM)", done: false },
+  { id: 26, category: "Saturday 7/25",  text: "Capture photos and share to the official SPARK 2026 hashtag", done: false },
+  { id: 27, category: "Sunday 7/26",    text: "Help with Breakfast flow and direct attendees to sessions (8–9:15AM)", done: false },
+  { id: 28, category: "Sunday 7/26",    text: "Staff Exhibit Hall for final morning (8AM–12PM)", done: false },
+  { id: 29, category: "Sunday 7/26",    text: "Support Sunday Presentations — room management and attendee assistance", done: false },
+  { id: 30, category: "Sunday 7/26",    text: "Assist with Empower & Engage interactive session (12:05–12:45PM)", done: false },
+  { id: 31, category: "Sunday 7/26",    text: "Be present for Closing Remarks and help wrap up (12:45–12:50PM)", done: false },
+  { id: 32, category: "After Event",    text: "Help with breakdown and direct attendees to exits and parking", done: false },
+  { id: 33, category: "After Event",    text: "Submit Ambassador feedback form within 24 hours of event close", done: false },
+  { id: 34, category: "After Event",    text: "Follow up with connections made at SPARK on LinkedIn or email", done: false },
+  { id: 35, category: "After Event",    text: "Share a SPARK 2026 recap post tagging IGA Nephropathy Foundation", done: false },
+  { id: 36, category: "After Event",    text: "Debrief with Ambassador team lead on wins and areas to improve", done: false },
 ];
 
 const SEED_SESSIONS = [
-  { id: 1,  day: "Friday 7/24",   title: "Check-In / Registration",              time: "12:00 PM – 8:00 PM",  room: "TBD",          capacity: 4, description: "Greet arriving attendees, hand out badges and materials, answer questions and direct to hotel/venue areas.", signups: [] },
-  { id: 2,  day: "Friday 7/24",   title: "IgAN Hope Portrait Sign-Ups",           time: "1:00 PM – 6:05 PM",   room: "TBD",          capacity: 2, description: "Encourage attendees to sign up for their portrait. Help manage the queue and keep energy upbeat.", signups: [] },
-  { id: 3,  day: "Friday 7/24",   title: "First Time at SPARK Mixer",             time: "3:00 PM – 3:30 PM",   room: "TBD",          capacity: 3, description: "Welcome first-timers, introduce them to the community, and make them feel at home.", signups: [] },
-  { id: 4,  day: "Friday 7/24",   title: "Exhibit Hall",                          time: "5:00 PM – 8:30 PM",   room: "Exhibit Hall", capacity: 5, description: "Roam the hall, connect attendees with exhibitors, keep booths staffed and energy high.", signups: [] },
-  { id: 5,  day: "Friday 7/24",   title: "Cocktail Hour / Reception",             time: "6:00 PM – 8:00 PM",   room: "TBD",          capacity: 4, description: "Circulate, introduce attendees to each other, support event flow and hospitality.", signups: [] },
-  { id: 6,  day: "Saturday 7/25", title: "SPARK Check-In",                        time: "7:30 AM – 8:30 AM",   room: "TBD",          capacity: 4, description: "Direct arriving attendees to check-in, distribute Saturday materials, answer questions.", signups: [] },
-  { id: 7,  day: "Saturday 7/25", title: "Breakfast",                             time: "7:30 AM – 8:30 AM",   room: "TBD",          capacity: 2, description: "Help manage breakfast flow, ensure seating is available, assist attendees with needs.", signups: [] },
-  { id: 8,  day: "Saturday 7/25", title: "Exhibit Hall",                          time: "8:00 AM – 8:00 PM",   room: "Exhibit Hall", capacity: 5, description: "Staff the exhibit hall throughout the day. Engage attendees and support exhibitors.", signups: [] },
-  { id: 9,  day: "Saturday 7/25", title: "Opening Sessions",                      time: "8:30 AM – 11:30 AM",  room: "Main Stage",   capacity: 4, description: "Manage seating, support AV needs, keep transitions smooth between Foundation Welcome, Keynote, and IgAN update.", signups: [] },
-  { id: 10, day: "Saturday 7/25", title: "Presentation: Kidney-Friendly Recipes", time: "11:35 AM – 12:20 PM", room: "TBD",          capacity: 2, description: "Assist presenter with materials, manage Q&A microphone, and monitor room capacity.", signups: [] },
-  { id: 11, day: "Saturday 7/25", title: "Lunch",                                 time: "12:25 PM – 1:30 PM",  room: "TBD",          capacity: 3, description: "Help with lunch flow, direct attendees, foster conversations and connections.", signups: [] },
-  { id: 12, day: "Saturday 7/25", title: "Kids Activity",                         time: "1:30 PM – 2:30 PM",   room: "TBD",          capacity: 3, description: "Assist with kids activities, keep children engaged, and support parents attending sessions.", signups: [] },
-  { id: 13, day: "Saturday 7/25", title: "Breakout Sessions 1a & 1b",             time: "1:35 PM – 2:25 PM",   room: "Rooms TBD",    capacity: 4, description: "Staff both breakout rooms — manage attendance, Q&A microphone, and timing.", signups: [] },
-  { id: 14, day: "Saturday 7/25", title: "Breakout Sessions 2a & 2b",             time: "2:35 PM – 3:25 PM",   room: "Rooms TBD",    capacity: 4, description: "Staff both breakout rooms — manage attendance, Q&A microphone, and timing.", signups: [] },
-  { id: 15, day: "Saturday 7/25", title: "Breakout Sessions 3a & 3b",             time: "3:35 PM – 4:25 PM",   room: "Rooms TBD",    capacity: 4, description: "Staff both breakout rooms — manage attendance, Q&A microphone, and timing.", signups: [] },
-  { id: 16, day: "Saturday 7/25", title: "Saturday Night SPARK & Awards",         time: "6:30 PM – 9:15 PM",   room: "TBD",          capacity: 5, description: "Coordinate seating, assist with awards setup, manage prize drawing, keep energy high all evening.", signups: [] },
-  { id: 17, day: "Sunday 7/26",   title: "Breakfast",                             time: "8:00 AM – 9:15 AM",   room: "TBD",          capacity: 2, description: "Help manage breakfast flow and direct attendees toward morning sessions.", signups: [] },
-  { id: 18, day: "Sunday 7/26",   title: "Exhibit Hall — Final Morning",          time: "8:00 AM – 12:00 PM",  room: "Exhibit Hall", capacity: 3, description: "Staff the exhibit hall for the final session. Help wrap up exhibitor needs.", signups: [] },
-  { id: 19, day: "Sunday 7/26",   title: "Presentation 1",                        time: "9:15 AM – 10:30 AM",  room: "TBD",          capacity: 2, description: "Manage room, Q&A microphone, and assist presenter with any logistics.", signups: [] },
-  { id: 20, day: "Sunday 7/26",   title: "Presentation 2",                        time: "10:35 AM – 11:30 AM", room: "TBD",          capacity: 2, description: "Manage room, Q&A microphone, and assist presenter with any logistics.", signups: [] },
-  { id: 21, day: "Sunday 7/26",   title: "Empower & Engage: Interactive Session", time: "11:35 AM – 12:35 PM", room: "TBD",          capacity: 4, description: "Support Foundation leadership with group activities, help facilitate attendee participation.", signups: [] },
-  { id: 22, day: "Sunday 7/26",   title: "Closing Remarks",                       time: "12:35 PM – 12:45 PM", room: "Main Stage",   capacity: 3, description: "Assist with final setup, manage seating, and help direct attendees out after close.", signups: [] },
+  // ── FRIDAY 7/24 ──────────────────────────────────────────
+  {
+    id: 1, day: "Friday 7/24",
+    title: "Check-In / Registration",
+    time: "12:00 PM – 8:00 PM", room: "Park Lane Hallway", capacity: 4,
+    description: "Greet arriving attendees, hand out badges and materials, answer questions, and direct guests to hotel areas.",
+    signups: [],
+  },
+  {
+    id: 2, day: "Friday 7/24",
+    title: "First Time at SPARK Mixer",
+    time: "3:00 PM – 3:45 PM", room: "Hope 3", capacity: 3,
+    description: "Welcome first-timers, help break the ice, introduce attendees to each other and get them excited for the weekend. High energy and casual.",
+    signups: [],
+  },
+  {
+    id: 3, day: "Friday 7/24",
+    title: "Start Strong: Understanding IgAN & the SPARK Experience",
+    time: "3:45 PM – 5:15 PM", room: "Trippe", capacity: 3,
+    description: "Seat attendees, assist speaker James Chevalier M.D., manage Q&A microphone, and monitor room capacity.",
+    signups: [],
+  },
+  {
+    id: 4, day: "Friday 7/24",
+    title: "Exhibit Hall",
+    time: "5:00 PM – 8:30 PM", room: "Windsor Pre-Function", capacity: 5,
+    description: "Roam the hall, connect attendees with exhibitors, keep booths staffed and energy high throughout the evening.",
+    signups: [],
+  },
+  {
+    id: 5, day: "Friday 7/24",
+    title: "Foundation Welcome and Update",
+    time: "5:30 PM – 6:00 PM", room: "Windsor Ballroom", capacity: 3,
+    description: "Manage seating, assist speakers Bonnie Schneider & Stuart Miller, ensure AV is ready, and keep transitions smooth.",
+    signups: [],
+  },
+  {
+    id: 6, day: "Friday 7/24",
+    title: "Cocktail Hour / Reception",
+    time: "6:00 PM – 8:00 PM", room: "Windsor Ballroom / Garden", capacity: 4,
+    description: "Circulate, introduce attendees to one another, support hospitality flow, and keep the energy warm and welcoming.",
+    signups: [],
+  },
+
+  // ── SATURDAY 7/25 ─────────────────────────────────────────
+  {
+    id: 7, day: "Saturday 7/25",
+    title: "SPARK Check-In",
+    time: "7:30 AM – 8:30 AM", room: "Park Lane Hallway", capacity: 4,
+    description: "Direct arriving attendees to check-in, distribute Saturday materials, and answer any questions.",
+    signups: [],
+  },
+  {
+    id: 8, day: "Saturday 7/25",
+    title: "Breakfast",
+    time: "7:30 AM – 8:30 AM", room: "Windsor Ballroom", capacity: 2,
+    description: "Help manage breakfast flow, ensure seating is available, and assist attendees with any needs.",
+    signups: [],
+  },
+  {
+    id: 9, day: "Saturday 7/25",
+    title: "Exhibit Hall",
+    time: "8:00 AM – 8:00 PM", room: "Windsor Pre-Function", capacity: 5,
+    description: "Staff the exhibit hall throughout the full day. Engage attendees, support exhibitors, and maintain energy.",
+    signups: [],
+  },
+  {
+    id: 10, day: "Saturday 7/25",
+    title: "Foundation Opening Remarks",
+    time: "8:30 AM – 9:05 AM", room: "Windsor Ballroom", capacity: 3,
+    description: "Manage seating, ensure AV is ready, support speaker Brian Parlato, and keep the room energized for the kickoff.",
+    signups: [],
+  },
+  {
+    id: 11, day: "Saturday 7/25",
+    title: "Keynote Speaker – Taylor Coffman",
+    time: "9:10 AM – 10:15 AM", room: "Windsor Ballroom", capacity: 3,
+    description: "Seat attendees, manage Q&A microphone, support speaker logistics, and be ready with tissues — this one is powerful!",
+    signups: [],
+  },
+  {
+    id: 12, day: "Saturday 7/25",
+    title: "The Latest in IgAN – Dr. Jonathan Barratt",
+    time: "10:20 AM – 11:30 AM", room: "Windsor Ballroom", capacity: 2,
+    description: "Manage room, Q&A microphone and timing. Assist attendees with questions after the session.",
+    signups: [],
+  },
+  {
+    id: 13, day: "Saturday 7/25",
+    title: "Reviewing FDA-Approved Treatments – Dr. Sayna Norouzi",
+    time: "11:35 AM – 12:20 PM", room: "Windsor Ballroom", capacity: 2,
+    description: "Manage room capacity, Q&A microphone, and assist presenter with any logistics.",
+    signups: [],
+  },
+  {
+    id: 14, day: "Saturday 7/25",
+    title: "Lunch",
+    time: "12:25 PM – 1:30 PM", room: "Windsor Ballroom / Garden", capacity: 3,
+    description: "Help with lunch flow, direct attendees, foster conversations, and maintain a welcoming atmosphere.",
+    signups: [],
+  },
+  {
+    id: 15, day: "Saturday 7/25",
+    title: "Kids Activity",
+    time: "1:30 PM – 2:30 PM", room: "Hope 3", capacity: 3,
+    description: "Assist with kids activities, keep children engaged and safe, support parents who are attending sessions.",
+    signups: [],
+  },
+  {
+    id: 16, day: "Saturday 7/25",
+    title: "Breakout 1a: Understanding Your Kidney Biopsy",
+    time: "1:35 PM – 2:25 PM", room: "Hope 1 & 2", capacity: 2,
+    description: "Manage room, assist speakers Jared Hassler MD & Tushar Patel MD, handle Q&A microphone and timing.",
+    signups: [],
+  },
+  {
+    id: 17, day: "Saturday 7/25",
+    title: "Breakout 1b: Caregiver Stories of IgAN",
+    time: "1:35 PM – 2:25 PM", room: "Trippe", capacity: 2,
+    description: "Manage room, support speaker Alena Riddick, ensure a safe and supportive atmosphere for this emotional session.",
+    signups: [],
+  },
+  {
+    id: 18, day: "Saturday 7/25",
+    title: "Breakout 2a: Understanding Your IgAN Labs",
+    time: "2:35 PM – 3:25 PM", room: "Hope", capacity: 2,
+    description: "Manage room, assist speaker Brad Rovin MD, handle Q&A microphone and timing.",
+    signups: [],
+  },
+  {
+    id: 19, day: "Saturday 7/25",
+    title: "Breakout 2b: Women and IgAN – Hormones & Family Planning",
+    time: "2:35 PM – 3:25 PM", room: "Trippe", capacity: 2,
+    description: "Manage room, support speaker Lina Wong DO. Ensure a comfortable, supportive environment for this personal session.",
+    signups: [],
+  },
+  {
+    id: 20, day: "Saturday 7/25",
+    title: "Breakout 3a: Nutrition and IgAN",
+    time: "3:35 PM – 4:25 PM", room: "Hope", capacity: 2,
+    description: "Manage room, assist speaker Lauren Budd Levy MS RDN, handle Q&A and distribute any materials.",
+    signups: [],
+  },
+  {
+    id: 21, day: "Saturday 7/25",
+    title: "Breakout 3b: Life After Kidney Transplant",
+    time: "3:35 PM – 4:25 PM", room: "Trippe", capacity: 2,
+    description: "Manage room, support speaker James Chevalier MD, handle Q&A microphone and timing.",
+    signups: [],
+  },
+  {
+    id: 22, day: "Saturday 7/25",
+    title: "Saturday Night SPARK: Mystery Dinner & Awards",
+    time: "6:00 PM – 9:00 PM", room: "Windsor Garden", capacity: 6,
+    description: "Coordinate seating for the mystery dinner experience, assist with awards setup, keep energy high, and help manage the interactive evening program.",
+    signups: [],
+  },
+  {
+    id: 23, day: "Saturday 7/25",
+    title: "Prize Drawing",
+    time: "9:00 PM – 9:15 PM", room: "Windsor Garden", capacity: 2,
+    description: "Assist with prize drawing logistics — manage crowd, hand out prizes, and wrap up the evening on a high note.",
+    signups: [],
+  },
+
+  // ── SUNDAY 7/26 ───────────────────────────────────────────
+  {
+    id: 24, day: "Sunday 7/26",
+    title: "Breakfast",
+    time: "8:00 AM – 9:15 AM", room: "Windsor Ballroom / Garden", capacity: 2,
+    description: "Help manage breakfast flow and direct attendees toward morning sessions.",
+    signups: [],
+  },
+  {
+    id: 25, day: "Sunday 7/26",
+    title: "Exhibit Hall – Final Morning",
+    time: "8:00 AM – 12:00 PM", room: "Windsor Pre-Function", capacity: 3,
+    description: "Staff the exhibit hall for the final session of the conference. Help wrap up exhibitor needs.",
+    signups: [],
+  },
+  {
+    id: 26, day: "Sunday 7/26",
+    title: "Where Hope Meets Discovery: IgAN Research Funding",
+    time: "9:00 AM – 10:00 AM", room: "Windsor Ballroom", capacity: 2,
+    description: "Manage room seating, Q&A microphone, and assist presenter with any logistics.",
+    signups: [],
+  },
+  {
+    id: 27, day: "Sunday 7/26",
+    title: "Breakout: Turning Science Into Solutions – Clinical Trials",
+    time: "10:05 AM – 11:00 AM", room: "Hope", capacity: 2,
+    description: "Manage room, assist speaker Brad Rovin MD, handle Q&A microphone and timing.",
+    signups: [],
+  },
+  {
+    id: 28, day: "Sunday 7/26",
+    title: "Breakout: Your Treatment, Your Rights – Coverage Barriers",
+    time: "10:05 AM – 11:00 AM", room: "Trippe", capacity: 2,
+    description: "Manage room, Q&A microphone, and ensure attendees can access materials and resources shared during the session.",
+    signups: [],
+  },
+  {
+    id: 29, day: "Sunday 7/26",
+    title: "Beyond the Diagnosis: Stories of Life with IgAN",
+    time: "11:05 AM – 12:00 PM", room: "Windsor Ballroom", capacity: 2,
+    description: "Manage room, support speaker Gisela Delgado, create a welcoming atmosphere for this personal storytelling session.",
+    signups: [],
+  },
+  {
+    id: 30, day: "Sunday 7/26",
+    title: "Empower & Engage: Interactive Session with Foundation & Ambassadors",
+    time: "12:05 PM – 12:45 PM", room: "Windsor Ballroom", capacity: 5,
+    description: "Key ambassador session! Support Foundation leadership, help facilitate attendee participation, manage audience interaction and microphone.",
+    signups: [],
+  },
+  {
+    id: 31, day: "Sunday 7/26",
+    title: "Closing Remarks",
+    time: "12:45 PM – 12:50 PM", room: "Windsor Ballroom", capacity: 3,
+    description: "Assist with final setup, manage seating, and help direct attendees out warmly after the conference closes.",
+    signups: [],
+  },
 ];
 
 function useRealtimeTable(table, setter) {
@@ -119,7 +309,6 @@ function useRealtimeTable(table, setter) {
   }, [table, setter]);
 }
 
-// ════════════════════════════════════════════════════════════
 export default function App() {
   const [ambassador, setAmbassador] = useState(() => localStorage.getItem("spark_ambassador") || "");
   const [nameInput, setNameInput]   = useState("");
@@ -141,15 +330,14 @@ export default function App() {
   return <Hub ambassador={ambassador} onLogout={handleLogout} />;
 }
 
-// ── Login Screen ─────────────────────────────────────────────
 function LoginScreen({ nameInput, setNameInput, onLogin }) {
   return (
     <div style={{ minHeight: "100vh", background: C.caveBlue, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Avenir','Gill Sans','Century Gothic',sans-serif", padding: 24, position: "relative", overflow: "hidden" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(158,181,203,0.12) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
       <div style={{ position: "relative", background: C.white, borderRadius: 20, padding: "48px 40px", maxWidth: 420, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)", textAlign: "center" }}>
-        <img src="/spark.png" alt="SPARK 2026" style={{ width: 160, margin: "0 auto 20px", display: "block" }} />
+        <img src="/spark.png" alt="SPARK 2026" style={{ width: 180, margin: "0 auto 24px", display: "block" }} />
         <div style={{ fontSize: 11, color: C.textLight, letterSpacing: 4, textTransform: "uppercase", fontWeight: 700, marginBottom: 8 }}>IGA Nephropathy Foundation</div>
-        <h1 style={{ margin: "0 0 4px", fontSize: 32, fontWeight: 900, color: C.caveBlue, fontFamily: "'Georgia','Times New Roman',serif", letterSpacing: -0.5 }}>SPARK 2026</h1>
+        <h1 style={{ margin: "0 0 4px", fontSize: 30, fontWeight: 900, color: C.caveBlue, fontFamily: "'Georgia','Times New Roman',serif", letterSpacing: -0.5 }}>SPARK 2026</h1>
         <div style={{ fontSize: 13, color: C.marigold, fontWeight: 800, letterSpacing: 2, marginBottom: 32 }}>AMBASSADOR HUB · ATLANTA</div>
         <div style={{ textAlign: "left", marginBottom: 8 }}>
           <label style={{ fontSize: 12, fontWeight: 800, color: C.textMid, letterSpacing: 1, textTransform: "uppercase" }}>Your Name</label>
@@ -160,13 +348,12 @@ function LoginScreen({ nameInput, setNameInput, onLogin }) {
         <button onClick={onLogin} style={{ width: "100%", background: C.marigold, color: C.white, border: "none", borderRadius: 10, padding: "14px", fontSize: 15, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", letterSpacing: 1 }}>
           Enter Hub →
         </button>
-        <p style={{ margin: "20px 0 0", fontSize: 12, color: C.textLight }}>Your name is saved in this browser so you won't need to re-enter it next time.</p>
+        <p style={{ margin: "20px 0 0", fontSize: 12, color: C.textLight }}>Your name is saved in this browser so you won't need to re-enter it.</p>
       </div>
     </div>
   );
 }
 
-// ── Main Hub ─────────────────────────────────────────────────
 function Hub({ ambassador, onLogout }) {
   const [view, setView]             = useState("dashboard");
   const [tasks, setTasks]           = useState([]);
@@ -217,14 +404,14 @@ function Hub({ ambassador, onLogout }) {
     await supabase.from("sessions").update({ signups }).eq("id", sid);
     flash();
   };
-  const removeSignup = async (sid, name) => {
+  const removeSignup  = async (sid, name) => {
     const s = sessions.find(x => x.id === sid);
     const signups = s.signups.filter(n => n !== name);
     setSessions(p => p.map(x => x.id === sid ? { ...x, signups } : x));
     await supabase.from("sessions").update({ signups }).eq("id", sid);
     flash("Removed");
   };
-  const addSession = async (session) => {
+  const addSession    = async (session) => {
     const row = { ...session, id: Date.now(), signups: [] };
     setSessions(p => [...p, row]);
     await supabase.from("sessions").insert(row);
@@ -235,13 +422,13 @@ function Hub({ ambassador, onLogout }) {
     await supabase.from("sessions").delete().eq("id", id);
     flash("Deleted");
   };
-  const addTask = async (category, text) => {
+  const addTask       = async (category, text) => {
     const row = { id: Date.now(), category, text, done: false };
     setTasks(t => [...t, row]);
     await supabase.from("tasks").insert(row);
     flash("Added ✓");
   };
-  const deleteTask = async (id) => {
+  const deleteTask    = async (id) => {
     setTasks(t => t.filter(x => x.id !== id));
     await supabase.from("tasks").delete().eq("id", id);
     flash("Deleted");
@@ -264,7 +451,7 @@ function Hub({ ambassador, onLogout }) {
 
   if (loading) return (
     <div style={{ minHeight: "100vh", background: C.caveBlue, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12, fontFamily: "'Avenir',sans-serif" }}>
-      <div style={{ fontSize: 32 }}>💙</div>
+      <img src="/spark.png" alt="SPARK" style={{ width: 140, marginBottom: 8 }} />
       <div style={{ color: C.marigold, fontSize: 16, fontWeight: 700, letterSpacing: 2 }}>Loading SPARK 2026...</div>
     </div>
   );
@@ -280,12 +467,12 @@ function Hub({ ambassador, onLogout }) {
       {/* Header */}
       <div style={{ background: C.caveBlue, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle, rgba(158,181,203,0.12) 1px, transparent 1px)", backgroundSize: "24px 24px" }} />
-        <div style={{ position: "relative", maxWidth: 980, margin: "0 auto", padding: "20px 24px" }}>
+        <div style={{ position: "relative", maxWidth: 980, margin: "0 auto", padding: "16px 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             <img src="/spark.png" alt="SPARK" style={{ height: 48, width: "auto", borderRadius: 8 }} />
             <div>
               <div style={{ fontSize: 10, color: C.powderBlue, letterSpacing: 4, textTransform: "uppercase", fontWeight: 600, marginBottom: 2 }}>IGA Nephropathy Foundation</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: C.white, letterSpacing: -0.5, fontFamily: "'Georgia',serif" }}>SPARK 2026 <span style={{ color: C.marigold, fontSize: 14, letterSpacing: 2 }}>AMBASSADOR HUB</span></div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: C.white, letterSpacing: -0.5, fontFamily: "'Georgia',serif" }}>SPARK 2026 <span style={{ color: C.marigold, fontSize: 13, letterSpacing: 2 }}>AMBASSADOR HUB</span></div>
             </div>
             <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
               <div style={{ textAlign: "right" }}>
@@ -325,7 +512,6 @@ function Hub({ ambassador, onLogout }) {
   );
 }
 
-// ── Dashboard ────────────────────────────────────────────────
 function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, onGoSessions }) {
   const myDone = tasks.filter(t => myProgress[t.id]).length;
   const pct    = tasks.length ? Math.round((myDone / tasks.length) * 100) : 0;
@@ -334,7 +520,6 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
 
   return (
     <div>
-      {/* Welcome banner */}
       <div style={{ background: `linear-gradient(135deg, ${C.caveBlue} 0%, #00618f 100%)`, borderRadius: 16, padding: "28px 32px", marginBottom: 24, color: C.white, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", right: -20, top: -20, width: 140, height: 140, borderRadius: "50%", background: "rgba(247,164,66,0.15)" }} />
         <div style={{ position: "absolute", right: 30, bottom: -40, width: 100, height: 100, borderRadius: "50%", background: "rgba(158,181,203,0.1)" }} />
@@ -343,11 +528,7 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
           <h2 style={{ margin: "0 0 4px", fontSize: 26, fontWeight: 900, fontFamily: "'Georgia',serif" }}>{ambassador}</h2>
           <p style={{ margin: "0 0 20px", color: C.powderBlue, fontSize: 14 }}>SPARK 2026 · Atlanta, GA · July 24–26</p>
           <div style={{ display: "flex", gap: 28, flexWrap: "wrap" }}>
-            {[
-              [mySessions.length, "Sessions Assigned"],
-              [`${myDone}/${tasks.length}`, "Tasks Complete"],
-              [`${pct}%`, "Overall Progress"],
-            ].map(([val, label]) => (
+            {[[mySessions.length, "Sessions Assigned"], [`${myDone}/${tasks.length}`, "Tasks Complete"], [`${pct}%`, "Overall Progress"]].map(([val, label]) => (
               <div key={label}>
                 <div style={{ fontSize: 28, fontWeight: 900, color: C.marigold }}>{val}</div>
                 <div style={{ fontSize: 11, color: C.powderBlue, letterSpacing: 1, textTransform: "uppercase" }}>{label}</div>
@@ -358,7 +539,6 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px,1fr))", gap: 20 }}>
-        {/* My Sessions */}
         <div style={{ background: C.white, borderRadius: 14, padding: 24, border: `1px solid ${C.steelGray}`, boxShadow: "0 2px 12px rgba(0,73,118,0.06)" }}>
           <h3 style={{ margin: "0 0 16px", fontSize: 13, fontWeight: 800, color: C.caveBlue, letterSpacing: 1, textTransform: "uppercase" }}>📅 My Sessions</h3>
           {mySessions.length === 0 ? (
@@ -384,7 +564,6 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
           )}
         </div>
 
-        {/* Next tasks */}
         <div style={{ background: C.white, borderRadius: 14, padding: 24, border: `1px solid ${C.steelGray}`, boxShadow: "0 2px 12px rgba(0,73,118,0.06)" }}>
           <h3 style={{ margin: "0 0 16px", fontSize: 13, fontWeight: 800, color: C.caveBlue, letterSpacing: 1, textTransform: "uppercase" }}>✅ Next Up</h3>
           <div style={{ marginBottom: 16 }}>
@@ -405,9 +584,7 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
                   </div>
                 ))}
                 {tasks.filter(t => !myProgress[t.id]).length > 5 && (
-                  <div style={{ fontSize: 12, color: C.textLight, textAlign: "center", marginTop: 4 }}>
-                    +{tasks.filter(t => !myProgress[t.id]).length - 5} more in Tasks tab
-                  </div>
+                  <div style={{ fontSize: 12, color: C.textLight, textAlign: "center", marginTop: 4 }}>+{tasks.filter(t => !myProgress[t.id]).length - 5} more in Tasks tab</div>
                 )}
               </div>
           }
@@ -417,7 +594,6 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
   );
 }
 
-// ── Tasks View ───────────────────────────────────────────────
 function TasksView({ tasks, myProgress, onToggle, onDelete, onEdit, onAdd }) {
   const [editingId, setEditingId] = useState(null);
   const [newTask, setNewTask]     = useState({ text: "", category: "Saturday 7/25" });
@@ -494,7 +670,6 @@ function TasksView({ tasks, myProgress, onToggle, onDelete, onEdit, onAdd }) {
   );
 }
 
-// ── Sessions View ────────────────────────────────────────────
 function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelete }) {
   const [signupTarget, setSignupTarget] = useState(null);
   const [signupName, setSignupName]     = useState("");
@@ -520,7 +695,6 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
         </div>
       </div>
 
-      {/* Day tabs */}
       <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
         {DAYS.map(day => {
           const ds     = sessions.filter(s => s.day === day);
@@ -545,7 +719,7 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
               style={{ background: C.lightBg, color: C.textDark, border: `1px solid ${C.steelGray}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, fontFamily: "inherit", gridColumn: "1/-1" }}>
               {DAYS.map(d => <option key={d}>{d}</option>)}
             </select>
-            {[["title", "Session Title *"], ["time", "Time *"], ["room", "Room / Location"], ["description", "Ambassador role description"]].map(([f, ph]) => (
+            {[["title","Session Title *"],["time","Time *"],["room","Room / Location"],["description","Ambassador role description"]].map(([f,ph]) => (
               <input key={f} value={newS[f]} onChange={e => setNewS({ ...newS, [f]: e.target.value })} placeholder={ph}
                 style={{ background: C.lightBg, color: C.textDark, border: `1px solid ${C.steelGray}`, borderRadius: 8, padding: "10px 14px", fontSize: 13, fontFamily: "inherit", gridColumn: f === "description" ? "1/-1" : "auto" }} />
             ))}
@@ -575,7 +749,7 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
                 <div style={{ width: 4, height: 36, borderRadius: 99, background: dc, flexShrink: 0, marginTop: 2 }} />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: 11, color: dc, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 }}>{s.time}</div>
-                  <h3 style={{ margin: 0, fontSize: 15, fontWeight: 800, color: C.caveBlue, lineHeight: 1.2, paddingRight: 4 }}>{s.title}</h3>
+                  <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: C.caveBlue, lineHeight: 1.3 }}>{s.title}</h3>
                 </div>
               </div>
 
@@ -624,7 +798,6 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
                   </div>
                 : <button onClick={() => setSignupTarget(s.id)} style={{ background: "none", border: `1.5px dashed ${C.steelGray}`, borderRadius: 8, color: C.textMid, padding: "7px 16px", cursor: "pointer", fontSize: 12, fontFamily: "inherit", width: "100%", fontWeight: 600 }}>+ Add Another Ambassador</button>
               )}
-
               <button onClick={() => onDelete(s.id)} style={{ position: "absolute", bottom: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: C.steelGray, fontSize: 12, padding: 4 }}>🗑️</button>
             </div>
           );
@@ -634,7 +807,6 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
   );
 }
 
-// ── Roster View ──────────────────────────────────────────────
 function RosterView({ sessions }) {
   const allNames = [...new Set(sessions.flatMap(s => s.signups))].sort();
 
