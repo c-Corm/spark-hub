@@ -76,6 +76,13 @@ const SEED_TASKS = [
 
 const SEED_SESSIONS = [
   // ── FRIDAY 7/24 ──────────────────────────────────────────
+    {
+    id: 6, day: "Friday 7/24",
+    title: "SPARK Setup",
+    time: "9:00 AM – 12:00 PM", room: "Park Lane Hallway", capacity: 6,
+    description: "Meet in the Park Lane Hallway to help with SPARK setup.",
+    signups: [],
+  },
   {
     id: 1, day: "Friday 7/24",
     title: "Check-In / Registration",
