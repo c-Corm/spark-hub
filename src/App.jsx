@@ -1,5 +1,15 @@
 // ============================================================
 // IGA NEPHROPATHY FOUNDATION — SPARK 2026 Ambassador Hub
+// Requires a `messages` table for Group Chat. Run in Supabase:
+//   CREATE TABLE messages (
+//     id bigint primary key,
+//     ambassador_name text,
+//     text text,
+//     mentions text[] default '{}',
+//     created_at timestamptz default now()
+//   );
+//   ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
+//   ALTER PUBLICATION supabase_realtime ADD TABLE messages;
 // ============================================================
 
 import { useState, useEffect, useCallback } from "react";
@@ -34,252 +44,6 @@ const CAT_STYLE = {
   "Sunday 7/26":    { dot: C.pomegranate, label: C.pomegranate },
   "After Event":    { dot: C.textLight,   label: C.textLight },
 };
-
-
-const SEED_SESSIONS = [
-  // ── FRIDAY 7/24 ──────────────────────────────────────────
-    {
-    id: 6, day: "Friday 7/24",
-    title: "SPARK Setup",
-    time: "9:00 AM – 12:00 PM", room: "Park Lane Hallway", capacity: 6,
-    description: "Meet in the Park Lane Hallway to help with SPARK setup.",
-    signups: [],
-  },
-  {
-    id: 1, day: "Friday 7/24",
-    title: "Check-In / Registration",
-    time: "12:00 PM – 8:00 PM", room: "Park Lane Hallway", capacity: 4,
-    description: "Greet arriving attendees, hand out badges and materials, answer questions, and direct guests to hotel areas.",
-    signups: [],
-  },
-  {
-    id: 2, day: "Friday 7/24",
-    title: "First Time at SPARK Mixer",
-    time: "3:00 PM – 3:45 PM", room: "Hope 3", capacity: 3,
-    description: "Welcome first-timers, help break the ice, introduce attendees to each other and get them excited for the weekend. High energy and casual.",
-    signups: [],
-  },
-  {
-    id: 3, day: "Friday 7/24",
-    title: "Start Strong: Understanding IgAN & the SPARK Experience",
-    time: "3:45 PM – 5:15 PM", room: "Trippe", capacity: 3,
-    description: "Seat attendees, assist speaker James Chevalier M.D., manage Q&A microphone, and monitor room capacity.",
-    signups: [],
-  },
-  {
-    id: 4, day: "Friday 7/24",
-    title: "Exhibit Hall",
-    time: "5:00 PM – 8:30 PM", room: "Windsor Pre-Function", capacity: 5,
-    description: "Roam the hall, connect attendees with exhibitors, keep booths staffed and energy high throughout the evening.",
-    signups: [],
-  },
-  {
-    id: 5, day: "Friday 7/24",
-    title: "Foundation Welcome and Update",
-    time: "5:30 PM – 6:00 PM", room: "Windsor Ballroom", capacity: 3,
-    description: "Manage seating, assist speakers Bonnie Schneider & Stuart Miller, ensure AV is ready, and keep transitions smooth.",
-    signups: [],
-  },
-  {
-    id: 6, day: "Friday 7/24",
-    title: "Cocktail Hour / Reception",
-    time: "6:00 PM – 8:00 PM", room: "Windsor Ballroom / Garden", capacity: 4,
-    description: "Circulate, introduce attendees to one another, support hospitality flow, and keep the energy warm and welcoming.",
-    signups: [],
-  },
- {
-    id: 6, day: "Friday 7/24",
-    title: "Man the Ambassador Table",
-    time: "6:00 PM – 8:00 PM", room: "Windsor Ballroom / Garden", capacity: 4,
-    description: ".",
-    signups: [],
-  },
-  // ── SATURDAY 7/25 ─────────────────────────────────────────
-  {
-    id: 7, day: "Saturday 7/25",
-    title: "SPARK Check-In",
-    time: "7:30 AM – 8:30 AM", room: "Park Lane Hallway", capacity: 4,
-    description: "Direct arriving attendees to check-in, distribute Saturday materials, and answer any questions.",
-    signups: [],
-  },
-  {
-    id: 8, day: "Saturday 7/25",
-    title: "Breakfast",
-    time: "7:30 AM – 8:30 AM", room: "Windsor Ballroom", capacity: 2,
-    description: "Help manage breakfast flow, ensure seating is available, and assist attendees with any needs.",
-    signups: [],
-  },
-  {
-    id: 9, day: "Saturday 7/25",
-    title: "Exhibit Hall",
-    time: "8:00 AM – 8:00 PM", room: "Windsor Pre-Function", capacity: 5,
-    description: "Staff the exhibit hall throughout the full day. Engage attendees, support exhibitors, and maintain energy.",
-    signups: [],
-  },
-  {
-    id: 10, day: "Saturday 7/25",
-    title: "Foundation Opening Remarks",
-    time: "8:30 AM – 9:05 AM", room: "Windsor Ballroom", capacity: 3,
-    description: "Manage seating, ensure AV is ready, support speaker Brian Parlato, and keep the room energized for the kickoff.",
-    signups: [],
-  },
-  {
-    id: 11, day: "Saturday 7/25",
-    title: "Keynote Speaker – Taylor Coffman",
-    time: "9:10 AM – 10:15 AM", room: "Windsor Ballroom", capacity: 3,
-    description: "Seat attendees, manage Q&A microphone, support speaker logistics, and be ready with tissues — this one is powerful!",
-    signups: [],
-  },
-  {
-    id: 12, day: "Saturday 7/25",
-    title: "The Latest in IgAN – Dr. Jonathan Barratt",
-    time: "10:20 AM – 11:30 AM", room: "Windsor Ballroom", capacity: 2,
-    description: "Manage room, Q&A microphone and timing. Assist attendees with questions after the session.",
-    signups: [],
-  },
-  {
-    id: 13, day: "Saturday 7/25",
-    title: "Reviewing FDA-Approved Treatments – Dr. Sayna Norouzi",
-    time: "11:35 AM – 12:20 PM", room: "Windsor Ballroom", capacity: 2,
-    description: "Manage room capacity, Q&A microphone, and assist presenter with any logistics.",
-    signups: [],
-  },
-  {
-    id: 14, day: "Saturday 7/25",
-    title: "Lunch",
-    time: "12:25 PM – 1:30 PM", room: "Windsor Ballroom / Garden", capacity: 3,
-    description: "Help with lunch flow, direct attendees, foster conversations, and maintain a welcoming atmosphere.",
-    signups: [],
-  },
-  {
-    id: 15, day: "Saturday 7/25",
-    title: "Kids Activity",
-    time: "1:30 PM – 2:30 PM", room: "Hope 3", capacity: 3,
-    description: "Assist with kids activities, keep children engaged and safe, support parents who are attending sessions.",
-    signups: [],
-  },
-  {
-    id: 16, day: "Saturday 7/25",
-    title: "Breakout 1a: Understanding Your Kidney Biopsy",
-    time: "1:35 PM – 2:25 PM", room: "Hope 1 & 2", capacity: 2,
-    description: "Manage room, assist speakers Jared Hassler MD & Tushar Patel MD, handle Q&A microphone and timing.",
-    signups: [],
-  },
-  {
-    id: 17, day: "Saturday 7/25",
-    title: "Breakout 1b: Caregiver Stories of IgAN",
-    time: "1:35 PM – 2:25 PM", room: "Trippe", capacity: 2,
-    description: "Manage room, support speaker Alena Riddick, ensure a safe and supportive atmosphere for this emotional session.",
-    signups: [],
-  },
-  {
-    id: 18, day: "Saturday 7/25",
-    title: "Breakout 2a: Understanding Your IgAN Labs",
-    time: "2:35 PM – 3:25 PM", room: "Hope", capacity: 2,
-    description: "Manage room, assist speaker Brad Rovin MD, handle Q&A microphone and timing.",
-    signups: [],
-  },
-  {
-    id: 19, day: "Saturday 7/25",
-    title: "Breakout 2b: Women and IgAN – Hormones & Family Planning",
-    time: "2:35 PM – 3:25 PM", room: "Trippe", capacity: 2,
-    description: "Manage room, support speaker Lina Wong DO. Ensure a comfortable, supportive environment for this personal session.",
-    signups: [],
-  },
-  {
-    id: 20, day: "Saturday 7/25",
-    title: "Breakout 3a: Nutrition and IgAN",
-    time: "3:35 PM – 4:25 PM", room: "Hope", capacity: 2,
-    description: "Manage room, assist speaker Lauren Budd Levy MS RDN, handle Q&A and distribute any materials.",
-    signups: [],
-  },
-  {
-    id: 21, day: "Saturday 7/25",
-    title: "Breakout 3b: Life After Kidney Transplant",
-    time: "3:35 PM – 4:25 PM", room: "Trippe", capacity: 2,
-    description: "Manage room, support speaker James Chevalier MD, handle Q&A microphone and timing.",
-    signups: [],
-  },
-  {
-    id: 22, day: "Saturday 7/25",
-    title: "Saturday Night SPARK: Mystery Dinner & Awards",
-    time: "6:00 PM – 9:00 PM", room: "Windsor Garden", capacity: 6,
-    description: "Coordinate seating for the mystery dinner experience, assist with awards setup, keep energy high, and help manage the interactive evening program.",
-    signups: [],
-  },
-  {
-    id: 23, day: "Saturday 7/25",
-    title: "Prize Drawing",
-    time: "9:00 PM – 9:15 PM", room: "Windsor Garden", capacity: 2,
-    description: "Assist with prize drawing logistics — manage crowd, hand out prizes, and wrap up the evening on a high note.",
-    signups: [],
-  },
-
-  // ── SUNDAY 7/26 ───────────────────────────────────────────
-  {
-    id: 24, day: "Sunday 7/26",
-    title: "Breakfast",
-    time: "8:00 AM – 9:15 AM", room: "Windsor Ballroom / Garden", capacity: 2,
-    description: "Help manage breakfast flow and direct attendees toward morning sessions.",
-    signups: [],
-  },
-  {
-    id: 25, day: "Sunday 7/26",
-    title: "Exhibit Hall – Final Morning",
-    time: "8:00 AM – 12:00 PM", room: "Windsor Pre-Function", capacity: 3,
-    description: "Staff the exhibit hall for the final session of the conference. Help wrap up exhibitor needs.",
-    signups: [],
-  },
-  {
-    id: 26, day: "Sunday 7/26",
-    title: "Where Hope Meets Discovery: IgAN Research Funding",
-    time: "9:00 AM – 10:00 AM", room: "Windsor Ballroom", capacity: 2,
-    description: "Manage room seating, Q&A microphone, and assist presenter with any logistics.",
-    signups: [],
-  },
-  {
-    id: 27, day: "Sunday 7/26",
-    title: "Breakout: Turning Science Into Solutions – Clinical Trials",
-    time: "10:05 AM – 11:00 AM", room: "Hope", capacity: 2,
-    description: "Manage room, assist speaker Brad Rovin MD, handle Q&A microphone and timing.",
-    signups: [],
-  },
-  {
-    id: 28, day: "Sunday 7/26",
-    title: "Breakout: Your Treatment, Your Rights – Coverage Barriers",
-    time: "10:05 AM – 11:00 AM", room: "Trippe", capacity: 2,
-    description: "Manage room, Q&A microphone, and ensure attendees can access materials and resources shared during the session.",
-    signups: [],
-  },
-  {
-    id: 29, day: "Sunday 7/26",
-    title: "Beyond the Diagnosis: Stories of Life with IgAN",
-    time: "11:05 AM – 12:00 PM", room: "Windsor Ballroom", capacity: 2,
-    description: "Manage room, support speaker Gisela Delgado, create a welcoming atmosphere for this personal storytelling session.",
-    signups: [],
-  },
-  {
-    id: 30, day: "Sunday 7/26",
-    title: "Empower & Engage: Interactive Session with Foundation & Ambassadors",
-    time: "12:05 PM – 12:45 PM", room: "Windsor Ballroom", capacity: 5,
-    description: "Key ambassador session! Support Foundation leadership, help facilitate attendee participation, manage audience interaction and microphone.",
-    signups: [],
-  },
-  {
-    id: 31, day: "Sunday 7/26",
-    title: "Closing Remarks",
-    time: "12:45 PM – 12:50 PM", room: "Windsor Ballroom", capacity: 3,
-    description: "Assist with final setup, manage seating, and help direct attendees out warmly after the conference closes.",
-    signups: [],
-  },
-  {
-    id: 31, day: "Sunday 7/26",
-    title: "Clean Up",
-    time: "1 PM – 3 PM", room: "Windsor Ballroom", capacity: 3,
-    description: "Assist with final setup, manage seating, and help direct attendees out warmly after the conference closes.",
-    signups: [],
-  },
-];
 
 function useRealtimeTable(table, setter) {
   useEffect(() => {
@@ -341,6 +105,8 @@ function Hub({ ambassador, onLogout }) {
   const [tasks, setTasks]           = useState([]);
   const [sessions, setSessions]     = useState([]);
   const [myProgress, setMyProgress] = useState({});
+  const [messages, setMessages]     = useState([]);
+  const [lastRead, setLastRead]     = useState(() => localStorage.getItem(`spark_chat_lastread_${ambassador}`) || new Date(0).toISOString());
   const [loading, setLoading]       = useState(true);
   const [syncMsg, setSyncMsg]       = useState("");
 
@@ -348,15 +114,15 @@ function Hub({ ambassador, onLogout }) {
 
   useEffect(() => {
     async function init() {
-      const [{ data: t }, { data: s }, { data: p }] = await Promise.all([
+      const [{ data: t }, { data: s }, { data: p }, { data: m }] = await Promise.all([
         supabase.from("tasks").select("*").order("id"),
         supabase.from("sessions").select("*").order("id"),
         supabase.from("task_progress").select("*").eq("ambassador_name", ambassador),
+        supabase.from("messages").select("*").order("created_at"),
       ]);
-      if (!t?.length) { await supabase.from("tasks").insert(SEED_TASKS); setTasks(SEED_TASKS); }
-      else setTasks(t);
-      if (!s?.length) { await supabase.from("sessions").insert(SEED_SESSIONS); setSessions(SEED_SESSIONS); }
-      else setSessions(s);
+      setTasks(t || []);
+      setSessions(s || []);
+      setMessages(m || []);
       const prog = {};
       (p || []).forEach(r => { prog[r.task_id] = r.done; });
       setMyProgress(prog);
@@ -367,6 +133,25 @@ function Hub({ ambassador, onLogout }) {
 
   useRealtimeTable("tasks",    useCallback(setTasks, []));
   useRealtimeTable("sessions", useCallback(setSessions, []));
+  useEffect(() => {
+    const ch = supabase.channel("rt-messages")
+      .on("postgres_changes", { event: "*", schema: "public", table: "messages" }, () => {
+        supabase.from("messages").select("*").order("created_at").then(({ data }) => data && setMessages(data));
+      }).subscribe();
+    return () => supabase.removeChannel(ch);
+  }, []);
+
+  const sendMessage = async (text, mentions) => {
+    const row = { id: Date.now(), ambassador_name: ambassador, text, mentions, created_at: new Date().toISOString() };
+    setMessages(m => [...m, row]);
+    await supabase.from("messages").insert(row);
+  };
+
+  const markChatRead = () => {
+    const now = new Date().toISOString();
+    setLastRead(now);
+    localStorage.setItem(`spark_chat_lastread_${ambassador}`, now);
+  };
 
   const toggleMyTask = async (taskId) => {
     const next = !(myProgress[taskId] || false);
@@ -424,10 +209,14 @@ function Hub({ ambassador, onLogout }) {
   const mySessions = sessions.filter(s => s.signups.includes(ambassador));
   const myDone     = tasks.filter(t => myProgress[t.id]).length;
 
+  const unreadCount   = messages.filter(m => new Date(m.created_at) > new Date(lastRead) && m.ambassador_name !== ambassador).length;
+  const mentionCount  = messages.filter(m => new Date(m.created_at) > new Date(lastRead) && (m.mentions || []).includes(ambassador)).length;
+
   const TABS = [
     { key: "dashboard", label: "🏠 My Dashboard" },
     { key: "tasks",     label: "📋 Tasks" },
     { key: "sessions",  label: "📅 Sessions" },
+    { key: "chat",       label: "💬 Group Chat" },
     { key: "roster",    label: "👥 All Ambassadors" },
   ];
 
@@ -473,13 +262,21 @@ function Hub({ ambassador, onLogout }) {
       <div style={{ background: C.white, borderBottom: `3px solid ${C.steelGray}`, boxShadow: "0 2px 8px rgba(0,73,118,0.07)" }}>
         <div style={{ maxWidth: 980, margin: "0 auto", padding: "0 24px", display: "flex", overflowX: "auto" }}>
           {TABS.map(tab => (
-            <button key={tab.key} onClick={() => setView(tab.key)} style={{
+            <button key={tab.key} onClick={() => { setView(tab.key); if (tab.key === "chat") markChatRead(); }} style={{
               background: "none", border: "none", cursor: "pointer", padding: "15px 20px", fontSize: 13,
               fontFamily: "inherit", fontWeight: view === tab.key ? 800 : 500, whiteSpace: "nowrap",
               color: view === tab.key ? C.caveBlue : C.textMid,
               borderBottom: view === tab.key ? `3px solid ${C.marigold}` : "3px solid transparent",
-              marginBottom: -3, transition: "all .2s",
-            }}>{tab.label}</button>
+              marginBottom: -3, transition: "all .2s", position: "relative",
+            }}>
+              {tab.label}
+              {tab.key === "chat" && (mentionCount > 0
+                ? <span style={{ position: "absolute", top: 8, right: 4, background: C.marigold, color: C.white, borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 900 }}>@{mentionCount}</span>
+                : unreadCount > 0
+                  ? <span style={{ position: "absolute", top: 8, right: 4, background: C.pomegranate, color: C.white, borderRadius: 20, padding: "1px 6px", fontSize: 10, fontWeight: 900 }}>{unreadCount}</span>
+                  : null
+              )}
+            </button>
           ))}
         </div>
       </div>
@@ -488,6 +285,7 @@ function Hub({ ambassador, onLogout }) {
         {view === "dashboard" && <Dashboard ambassador={ambassador} sessions={sessions} tasks={tasks} myProgress={myProgress} mySessions={mySessions} onToggleTask={toggleMyTask} onGoSessions={() => setView("sessions")} />}
         {view === "tasks"     && <TasksView tasks={tasks} myProgress={myProgress} onToggle={toggleMyTask} onDelete={deleteTask} onEdit={updateTaskText} onAdd={addTask} />}
         {view === "sessions"  && <SessionsView sessions={sessions} ambassador={ambassador} onSignup={signupToSession} onRemove={removeSignup} onAdd={addSession} onDelete={deleteSession} />}
+        {view === "chat"      && <ChatView ambassador={ambassador} messages={messages} sessions={sessions} onSend={sendMessage} />}
         {view === "roster"    && <RosterView sessions={sessions} />}
       </div>
     </div>
@@ -784,6 +582,128 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ── Chat View ────────────────────────────────────────────────
+function renderMessageParts(text, knownNames) {
+  if (!knownNames.length) return [text];
+  const escaped = [...knownNames].sort((a, b) => b.length - a.length).map(n => n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const pattern = new RegExp(`@(${escaped.join("|")})`, "g");
+  const parts = [];
+  let lastIndex = 0, match;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+    parts.push({ mention: match[0] });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return parts;
+}
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return new Date(iso).toLocaleDateString();
+}
+
+function ChatView({ ambassador, messages, sessions, onSend }) {
+  const [text, setText]               = useState("");
+  const [showMentions, setShowMentions] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+
+  const knownNames = [...new Set([ambassador, ...sessions.flatMap(s => s.signups)])].sort();
+  const filteredMentions = knownNames.filter(n => n.toLowerCase().includes(mentionQuery.toLowerCase()) && n !== ambassador).slice(0, 5);
+
+  const handleChange = (val) => {
+    setText(val);
+    const m = val.match(/@([a-zA-Z ]*)$/);
+    if (m) { setMentionQuery(m[1]); setShowMentions(true); }
+    else setShowMentions(false);
+  };
+
+  const selectMention = (name) => {
+    setText(prev => prev.replace(/@([a-zA-Z ]*)$/, `@${name} `));
+    setShowMentions(false);
+  };
+
+  const handleSend = () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const mentions = knownNames.filter(n => trimmed.includes(`@${n}`));
+    onSend(trimmed, mentions);
+    setText("");
+    setShowMentions(false);
+  };
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: C.caveBlue }}>Group Chat</h2>
+        <p style={{ margin: "6px 0 0", fontSize: 13, color: C.textMid }}>One shared chat for all ambassadors. Type @ to mention someone.</p>
+      </div>
+
+      <div style={{ background: C.white, borderRadius: 14, border: `1px solid ${C.steelGray}`, boxShadow: "0 2px 12px rgba(0,73,118,0.06)", display: "flex", flexDirection: "column", height: 520 }}>
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
+          {messages.length === 0 ? (
+            <div style={{ textAlign: "center", color: C.textLight, margin: "auto" }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
+              <p style={{ fontSize: 13 }}>No messages yet. Say hi to the team!</p>
+            </div>
+          ) : messages.map(m => {
+            const isMe = m.ambassador_name === ambassador;
+            const isMentioned = (m.mentions || []).includes(ambassador);
+            return (
+              <div key={m.id} style={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+                <div style={{ fontSize: 11, color: C.textLight, marginBottom: 4, fontWeight: 600 }}>
+                  {isMe ? "You" : m.ambassador_name} · {timeAgo(m.created_at)}
+                </div>
+                <div style={{
+                  background: isMe ? C.caveBlue : isMentioned ? "rgba(247,164,66,0.12)" : C.lightBg,
+                  color: isMe ? C.white : C.textDark,
+                  border: isMentioned && !isMe ? `1.5px solid ${C.marigold}` : "none",
+                  borderRadius: 14, padding: "10px 14px", maxWidth: "75%", fontSize: 14, lineHeight: 1.45,
+                }}>
+                  {renderMessageParts(m.text, knownNames).map((p, i) =>
+                    typeof p === "string"
+                      ? <span key={i}>{p}</span>
+                      : <span key={i} style={{ color: isMe ? C.marigold : C.caveBlue, fontWeight: 800 }}>{p.mention}</span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Input */}
+        <div style={{ borderTop: `1px solid ${C.steelGray}`, padding: 14, position: "relative" }}>
+          {showMentions && filteredMentions.length > 0 && (
+            <div style={{ position: "absolute", bottom: "100%", left: 14, right: 14, background: C.white, border: `1px solid ${C.steelGray}`, borderRadius: 10, boxShadow: "0 -4px 16px rgba(0,73,118,0.12)", marginBottom: 6, overflow: "hidden" }}>
+              {filteredMentions.map(name => (
+                <div key={name} onClick={() => selectMention(name)} style={{ padding: "10px 14px", cursor: "pointer", fontSize: 13, color: C.textDark, fontWeight: 600 }}
+                  onMouseEnter={e => e.currentTarget.style.background = C.lightBg} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  @{name}
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ display: "flex", gap: 10 }}>
+            <input value={text} onChange={e => handleChange(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && !showMentions && handleSend()}
+              placeholder="Type a message... use @ to mention someone"
+              style={{ flex: 1, background: C.lightBg, color: C.textDark, border: `1px solid ${C.steelGray}`, borderRadius: 10, padding: "12px 14px", fontSize: 14, fontFamily: "inherit", outline: "none" }} />
+            <button onClick={handleSend} style={{ background: C.marigold, color: C.white, border: "none", borderRadius: 10, padding: "12px 22px", fontWeight: 800, cursor: "pointer", fontFamily: "inherit", fontSize: 13 }}>
+              Send
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
