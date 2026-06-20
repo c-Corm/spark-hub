@@ -35,23 +35,6 @@ const CAT_STYLE = {
   "After Event":    { dot: C.textLight,   label: C.textLight },
 };
 
-const SEED_TASKS = [
-  { id: 1,  category: "Before Event",   text: "Review the full SPARK 2026 agenda for all three days", done: false },
-  { id: 3,  category: "Before Event",   text: "Familiarize yourself with the venue layout and room locations", done: false },
-  { id: 4,  category: "Before Event",   text: "Pick up your Ambassador badge, lanyard, and welcome kit at Check-In", done: false },
-  { id: 5,  category: "Before Event",   text: "Join the Ambassador group chat or communication channel", done: false },
-  { id: 6,  category: "Before Event",   text: "Know your assigned sessions and responsibilities for each day", done: false },
-  { id: 7, category: "Friday 7/24",    text: "Mingle with Attendees and foster connections", done: false },
-  { id: 8, category: "Saturday 7/25",  text: "Assist with SPARK Check-In (7:30–8:30AM) and direct attendees", done: false },
-  { id: 10, category: "Saturday 7/25",  text: "Have breakfast with someone you don't know", done: false },
-  { id: 11, category: "Saturday 7/25",  text: "Have lunch with someone you don't know", done: false },
-  { id: 12, category: "Saturday 7/25",  text: "Capture photos and share to the official SPARK 2026 hashtag #IgANSpark2026", done: false },
-  { id: 13, category: "Sunday 7/26",  text: "Have breakfast with someone you don't know", done: false },
-  { id: 19, category: "Sunday 7/26",    text: "Be present for Closing Remarks and help wrap up (12:45–12:50PM)", done: false },
-  { id: 20, category: "After Event",    text: "Help with breakdown", done: false },
-  { id: 21, category: "After Event",    text: "Submit Ambassador feedback within a week of event close", done: false },
-  { id: 22, category: "After Event",    text: "Share a SPARK 2026 recap post tagging IGA Nephropathy Foundation", done: false },
-];
 
 const SEED_SESSIONS = [
   // ── FRIDAY 7/24 ──────────────────────────────────────────
