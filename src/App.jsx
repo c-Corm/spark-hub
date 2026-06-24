@@ -164,19 +164,16 @@ function Hub({ ambassador, onLogout }) {
   };
 
   const signupToSession = async (sid, name) => {
-    const s = sessions.find(x => x.id === sid);
-    if (!s || s.signups.length >= s.capacity) return;
-    const signups = [...s.signups, name];
-    setSessions(p => p.map(x => x.id === sid ? { ...x, signups } : x));
-    await supabase.from("sessions").update({ signups }).eq("id", sid);
-    flash();
+  const s = sessions.find(x => x.id === sid);
+  if (!s || s.signups.length >= s.capacity) return;
+  await supabase.rpc("add_signup", { session_id: sid, ambassador_name: name });
+  flash();
+};
   };
-  const removeSignup  = async (sid, name) => {
-    const s = sessions.find(x => x.id === sid);
-    const signups = s.signups.filter(n => n !== name);
-    setSessions(p => p.map(x => x.id === sid ? { ...x, signups } : x));
-    await supabase.from("sessions").update({ signups }).eq("id", sid);
-    flash("Removed");
+ const removeSignup = async (sid, name) => {
+  await supabase.rpc("remove_signup", { session_id: sid, ambassador_name: name });
+  flash("Removed");
+};
   };
   const addSession    = async (session) => {
     const row = { ...session, id: Date.now(), signups: [] };
