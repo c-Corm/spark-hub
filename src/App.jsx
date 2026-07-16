@@ -164,16 +164,16 @@ function Hub({ ambassador, onLogout }) {
   };
 
   const signupToSession = async (sid, name) => {
-  const s = sessions.find(x => x.id === sid);
-  if (!s || s.signups.length >= s.capacity) return;
-  await supabase.rpc("add_signup", { session_id: sid, ambassador_name: name });
-  flash();
-};
+    const s = sessions.find(x => x.id === sid);
+    if (!s || s.signups.length >= s.capacity) return;
+    // Uses an atomic Postgres function to prevent race-condition overwrites.
+    // Realtime listener will push the updated row back to all clients.
+    await supabase.rpc("add_signup", { session_id: sid, ambassador_name: name });
+    flash();
   };
- const removeSignup = async (sid, name) => {
-  await supabase.rpc("remove_signup", { session_id: sid, ambassador_name: name });
-  flash("Removed");
-};
+  const removeSignup = async (sid, name) => {
+    await supabase.rpc("remove_signup", { session_id: sid, ambassador_name: name });
+    flash("Removed");
   };
   const addSession    = async (session) => {
     const row = { ...session, id: Date.now(), signups: [] };
@@ -280,8 +280,8 @@ function Hub({ ambassador, onLogout }) {
 
       <div style={{ maxWidth: 980, margin: "0 auto", padding: "28px 24px" }}>
         {view === "dashboard" && <Dashboard ambassador={ambassador} sessions={sessions} tasks={tasks} myProgress={myProgress} mySessions={mySessions} onToggleTask={toggleMyTask} onGoSessions={() => setView("sessions")} />}
-        {view === "tasks"     && <TasksView tasks={tasks} myProgress={myProgress} onToggle={toggleMyTask} onDelete={deleteTask} onEdit={updateTaskText} onAdd={addTask} />}
-        {view === "sessions"  && <SessionsView sessions={sessions} ambassador={ambassador} onSignup={signupToSession} onRemove={removeSignup} onAdd={addSession} onDelete={deleteSession} />}
+        {view === "tasks"     && <TasksView tasks={tasks} myProgress={myProgress} onToggle={toggleMyTask} onEdit={updateTaskText} onAdd={addTask} />}
+        {view === "sessions"  && <SessionsView sessions={sessions} ambassador={ambassador} onSignup={signupToSession} onRemove={removeSignup} onAdd={addSession} />}
         {view === "chat"      && <ChatView ambassador={ambassador} messages={messages} sessions={sessions} onSend={sendMessage} />}
         {view === "roster"    && <RosterView sessions={sessions} />}
       </div>
@@ -371,7 +371,7 @@ function Dashboard({ ambassador, tasks, myProgress, mySessions, onToggleTask, on
   );
 }
 
-function TasksView({ tasks, myProgress, onToggle, onDelete, onEdit, onAdd }) {
+function TasksView({ tasks, myProgress, onToggle, onEdit, onAdd }) {
   const [editingId, setEditingId] = useState(null);
   const [newTask, setNewTask]     = useState({ text: "", category: "Saturday 7/25" });
   const [showAdd, setShowAdd]     = useState(false);
@@ -435,7 +435,6 @@ function TasksView({ tasks, myProgress, onToggle, onDelete, onEdit, onAdd }) {
                       : <span style={{ flex: 1, fontSize: 14, textDecoration: isDone ? "line-through" : "none", color: isDone ? C.textLight : C.textDark, lineHeight: 1.4 }}>{task.text}</span>
                     }
                     <button onClick={() => setEditingId(editingId === task.id ? null : task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.textLight, fontSize: 13, padding: "2px 5px", flexShrink: 0 }}>✏️</button>
-                    <button onClick={() => onDelete(task.id)} style={{ background: "none", border: "none", cursor: "pointer", color: C.textLight, fontSize: 13, padding: "2px 5px", flexShrink: 0 }}>🗑️</button>
                   </div>
                 );
               })}
@@ -447,7 +446,7 @@ function TasksView({ tasks, myProgress, onToggle, onDelete, onEdit, onAdd }) {
   );
 }
 
-function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelete }) {
+function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd }) {
   const [signupTarget, setSignupTarget] = useState(null);
   const [signupName, setSignupName]     = useState("");
   const [showAdd, setShowAdd]           = useState(false);
@@ -575,7 +574,7 @@ function SessionsView({ sessions, ambassador, onSignup, onRemove, onAdd, onDelet
                   </div>
                 : <button onClick={() => setSignupTarget(s.id)} style={{ background: "none", border: `1.5px dashed ${C.steelGray}`, borderRadius: 8, color: C.textMid, padding: "7px 16px", cursor: "pointer", fontSize: 12, fontFamily: "inherit", width: "100%", fontWeight: 600 }}>+ Add Another Ambassador</button>
               )}
-              <button onClick={() => onDelete(s.id)} style={{ position: "absolute", bottom: 14, right: 14, background: "none", border: "none", cursor: "pointer", color: C.steelGray, fontSize: 12, padding: 4 }}>🗑️</button>
+
             </div>
           );
         })}
