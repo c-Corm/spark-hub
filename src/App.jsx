@@ -9,7 +9,7 @@
 //     created_at timestamptz default now()
 //   );
 //   ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
-//   ALTER PUBLICATION supabase_realtime ADD TABLE messages;
+//   ALTER PUBLICATION supabase_realtime ADD TABLE messages; redeploy 
 // ============================================================
 
 import { useState, useEffect, useCallback } from "react";
